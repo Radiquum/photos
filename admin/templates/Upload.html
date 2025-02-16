@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<form id="upload-form" class="py-2 border border-gray-700 px-2 rounded-lg flex flex-col gap-4"
+    enctype="multipart/form-data">
+
+    <div class="flex gap-2">
+        <div class="w-128 h-64 border-2 rounded-lg overflow-hidden hidden border-gray-600 bg-gray-700 p-2"
+            id="image-container">
+            <img id="image-preview" src="#" alt="your image" class="w-full h-full object-contain" />
+        </div>
+
+        <div class="flex items-center justify-center w-full">
+            <label for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer bg-gray-700 border-gray-600 hover:border-gray-500 hover:bg-gray-600">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg class="w-8 h-8 mb-4 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 20 16">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
+                    </svg>
+                    <p class="mb-2 text-sm text-gray-400"><span class="font-semibold">Click to
+                            upload</span> or drag and drop</p>
+                    <p class="text-xs text-gray-400">PNG, JPG or GIF</p>
+                </div>
+                <input id="dropzone-file" type="file" class="hidden" accept="image/*" name="file" />
+            </label>
+        </div>
+        <div class="h-64 w-128">
+            <textarea id="alt-text" rows="11" name="alt"
+                class="block p-2.5 text-sm text-gray-900 w-full h-full resize-none bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Alt-Text" draggable="false"></textarea>
+        </div>
+    </div>
+
+    <div class="flex gap-4">
+        <div id="datepicker-inline" inline-datepicker datepicker-buttons
+            datepicker-format="dd/mm/yyyy" datepicker-title="Shoot Date" data-date="today"></div>
+        <div class="w-full flex flex-col gap-4">
+            <div class="w-full">
+                <label for="tags-input"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tags</label>
+                <input type="text" id="tags-input"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="Winter" />
+                <div class="w-full flex gap-2 mt-2 flex-wrap" id="tags-container">
+                </div>
+            </div>
+            <div class="w-full">
+                <label for="url-input" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Urls</label>
+                <input type="text" id="url-input"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    placeholder="https://www.example.com" />
+                <div class="w-full flex flex-wrap gap-2 mt-2" id="url-container">
+                </div>
+            </div>
+            <div class="w-full flex flex-wrap gap-2">
+                <button type="submit"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Upload</button>
+                <button type="reset"
+                    class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Reset</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+
+    let datepicker = null;
+
+    window.onload = () => {
+        datepicker = FlowbiteInstances.getInstance('Datepicker', 'datepicker-inline')
+    }
+
+    const imgInp = document.getElementById('dropzone-file');
+    const imgPre = document.getElementById('image-preview');
+    const imgCon = document.getElementById('image-container');
+    imgInp.onchange = evt => {
+        const [file] = imgInp.files
+        if (file) {
+            imgPre.src = URL.createObjectURL(file)
+            imgCon.classList.remove("hidden")
+            imgCon.classList.add("flex")
+        }
+    }
+
+    const tagSearch = ["Winter", "Summer", "Spring", "Autumn"];
+    const tags = [];
+
+    const tagInp = document.getElementById('tags-input')
+    const tagCon = document.getElementById('tags-container')
+    tagInp.addEventListener('input', (e) => {
+        if (e.target.value.includes(',')) {
+            const tag = e.target.value.split(',')[0].trim().replaceAll(" ", "_").toLowerCase();
+            if (tags.includes(tag)) {
+                tagInp.value = '';
+                return;
+            };
+
+            tags.push(tag);
+            tagInp.value = '';
+            tagCon.innerHTML = '';
+            tags.forEach(tag => {
+                const tagEl = document.createElement('div');
+                tagEl.classList.add('bg-gray-600', 'rounded-lg', 'p-2', 'flex', 'items-center', 'gap-2');
+                tagEl.innerHTML = `${tag} <button class="rounded-full bg-gray-800 w-6 h-6 text-sm cursor-pointer" type="button" onclick="removeTag('${tag}')">X</button>`;
+                tagCon.appendChild(tagEl);
+            });
+        }
+    });
+
+    function removeTag(tag) {
+        tags.splice(tags.indexOf(tag), 1);
+        tagCon.innerHTML = '';
+        tags.forEach(tag => {
+            const tagEl = document.createElement('div');
+            tagEl.classList.add('bg-gray-600', 'rounded-lg', 'p-2', 'flex', 'items-center', 'gap-2');
+            tagEl.innerHTML = `${tag} <button class="rounded-full bg-gray-800 w-6 h-6 text-sm cursor-pointer" type="button" onclick="removeTag('${tag}')">X</button>`;
+            tagCon.appendChild(tagEl);
+        });
+    };
+
+    const urlInp = document.getElementById('url-input')
+    const urlCon = document.getElementById('url-container')
+    let urls = [];
+
+    urlInp.addEventListener('keyup', (e) => {
+        if (e.code == 'Enter') {
+            if (!e.target.value.startsWith('http')) { alert('Invalid URL'); return; }
+            if (!e.target.value.split('/')[2].includes(".")) { alert('Invalid URL'); return; }
+            if (urls.find(url => url.value === e.target.value.trim())) { e.target.value = ''; return; }
+
+            const urlEl = document.createElement('input');
+            urlEl.type = 'text';
+            urlEl.classList.add('bg-gray-50', 'border', 'border-gray-300', 'text-gray-900', 'text-sm', 'rounded-lg', 'focus:ring-blue-500', 'focus:border-blue-500', 'block', 'w-full', 'p-2.5', 'dark:bg-gray-700', 'dark:border-gray-600', 'dark:placeholder-gray-400', 'dark:text-white', 'dark:focus:ring-blue-500', 'dark:focus:border-blue-500');
+            urlEl.value = e.target.value.trim();
+            urlEl.dataset.name = `${e.target.value.split('/')[2].split('.')[0]}`;
+            urlEl.onchange = (e) => {
+                const target = urls.find(url => url.name === e.target.dataset.name);
+                const index = urls.indexOf(url => url.name === e.target.dataset.name);
+                if (e.target.value.trim() === '') {
+                    urls.splice(index, 1);
+                    urlCon.removeChild(e.target);
+                    return;
+                }
+                if (target) {
+                    target.value = e.target.value.trim();
+                    return;
+                }
+            }
+            urls.push({
+                name: e.target.value.split('/')[2].split('.')[0],
+                value: e.target.value.trim()
+            })
+            urlCon.appendChild(urlEl)
+
+            e.target.value = '';
+        }
+    });
+
+    const form = document.getElementById('upload-form');
+    form.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevent form submission
+        }
+    });
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const formFields = form.elements;
+        const formData = new FormData(form);
+        if (!formFields['file'].files.length > 0) {
+            alert('Please select a file');
+            return;
+        }
+        if (!datepicker.getDate()) {
+            alert('Please select a date');
+            return;
+        }
+
+        let convertedUrls = "";
+        urls.forEach(url => {
+            convertedUrls += `{"name":"${url.name}","value":"${url.value}"};`;
+        });
+        formData.set('file', formFields['file'].files[0]);
+        formData.set('alt', formFields['alt'].value.trim());
+        formData.append('tags', tags.toString());
+        formData.append('urls', convertedUrls.toString());
+        formData.append('date', datepicker.getDatepickerInstance().picker.viewDate);
+
+        for (let pair of formData.entries()) {
+            if (pair[0] == "urls") {
+                console.log(`${pair[0]}:`, urls);
+            } else {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
+        }
+
+        fetch('{{ url_for("ApiUpload") }}', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                alert(data.message);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    });
+
+</script>
+
+
+{% endblock %}
