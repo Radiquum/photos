@@ -1,5 +1,8 @@
-python-dotenv
+python-dotenv   # Load environment variables from .env
 
-Flask
-boto3
-pillow
+boto3==1.35.99           # AWS SDK for Python (S3)
+boto3-stubs[essential]
+firebase-admin  # Firebase Admin SDK for Python (FireStore)
+
+Flask           # Web framework
+pillow          # Image processing

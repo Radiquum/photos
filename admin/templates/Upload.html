@@ -56,9 +56,9 @@
                 </div>
             </div>
             <div class="w-full flex flex-wrap gap-2">
-                <button type="submit"
+                <button type="submit" id="btn-submit"
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Upload</button>
-                <button type="reset"
+                <button type="reset" id="btn-reset"
                     class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Reset</button>
             </div>
         </div>
@@ -87,7 +87,7 @@
     }
 
     const tagSearch = ["Winter", "Summer", "Spring", "Autumn"];
-    const tags = [];
+    let tags = [];
 
     const tagInp = document.getElementById('tags-input')
     const tagCon = document.getElementById('tags-container')
@@ -160,6 +160,22 @@
         }
     });
 
+    const btnReset = document.getElementById('btn-reset');
+    const btnSubmit = document.getElementById('btn-submit');
+
+    btnReset.addEventListener('click', () => {
+        imgCon.classList.add("hidden")
+        imgCon.classList.remove("flex")
+        imgPre.src = '';
+        tagInp.value = '';
+        tagCon.innerHTML = '';
+        tags = [];
+        urlInp.value = '';
+        urlCon.innerHTML = '';
+        urls = [];
+        datepicker.setDate("today");
+    });
+
     const form = document.getElementById('upload-form');
     form.addEventListener('keydown', (e) => {
         if (e.key === "Enter") {
@@ -168,6 +184,7 @@
     });
     form.addEventListener('submit', (e) => {
         e.preventDefault();
+        btnSubmit.disabled = true;
 
         const formFields = form.elements;
         const formData = new FormData(form);
@@ -205,10 +222,13 @@
             .then(res => res.json())
             .then(data => {
                 console.log(data);
+                btnSubmit.disabled = false;
                 alert(data.message);
+                window.location.href = "{{ url_for('Home') }}";
             })
             .catch(err => {
                 console.log(err);
+                btnSubmit.disabled = false;
             })
     });
 
