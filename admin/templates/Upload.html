@@ -35,8 +35,8 @@
     </div>
 
     <div class="flex gap-4">
-        <div id="datepicker-inline" inline-datepicker datepicker-buttons
-            datepicker-format="dd/mm/yyyy" datepicker-title="Shoot Date" data-date="today"></div>
+        <div id="datepicker-inline" inline-datepicker datepicker-buttons datepicker-format="dd/mm/yyyy"
+            datepicker-title="Shoot Date" data-date="today"></div>
         <div class="w-full flex flex-col gap-4">
             <div class="w-full">
                 <label for="tags-input"
@@ -184,7 +184,6 @@
     });
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        btnSubmit.disabled = true;
 
         const formFields = form.elements;
         const formData = new FormData(form);
@@ -215,20 +214,27 @@
             }
         }
 
+        btnSubmit.setAttribute('disabled', true);
+
         fetch('{{ url_for("ApiUpload") }}', {
             method: 'POST',
             body: formData
         })
-            .then(res => res.json())
+            .then(res => {
+                return res.json();
+            })
             .then(data => {
                 console.log(data);
-                btnSubmit.disabled = false;
+                btnSubmit.removeAttribute('disabled');
                 alert(data.message);
-                window.location.href = "{{ url_for('Home') }}";
+                if (data.status != "error") {
+                    window.location.href = "{{ url_for('Home') }}";
+                }
             })
             .catch(err => {
                 console.log(err);
-                btnSubmit.disabled = false;
+                btnSubmit.removeAttribute('disabled');
+                alert(err.message);
             })
     });
 

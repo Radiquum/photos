@@ -10,7 +10,9 @@ import boto3
 from botocore.client import Config
 from botocore.exceptions import ClientError, SSLError
 import firebase_admin
-from firebase_admin import firestore, credentials, exceptions
+from firebase_admin import firestore, credentials
+from firebase_admin import exceptions as FB_EXCEPTION
+from google.api_core import exceptions as GOOGLE_EXCEPTION
 
 load_dotenv()
 UPLOAD_FOLDER = "./temp"
@@ -123,19 +125,6 @@ def ApiUpload():
         )
 
     Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    TMP_FILE = open(os.path.join(app.config["UPLOAD_FOLDER"], filename), "rb")
-    file_path = filename.split(".")[0]
-    file_ext = filename.split(".")[-1]
-
-    s3OrigFileResponse = upload_file(
-        TMP_FILE, os.getenv("AWS_BUCKET"), f"{file_path}/{filename}", file.mimetype
-    )
-    if s3OrigFileResponse is not True:
-        return Response(
-            json.dumps({"status": "error", "message": f"S3 ERR: {s3OrigFileResponse}"}),
-            500,
-        )
-
     try:
         db.collection(os.getenv("PREFIX")).add(
             {
@@ -149,9 +138,56 @@ def ApiUpload():
             },
             request.files["file"].filename,
         )
-    except exceptions.CONFLICT:
+    except (FB_EXCEPTION.ConflictError, FB_EXCEPTION.AlreadyExistsError, GOOGLE_EXCEPTION.AlreadyExists) as e:
+        Image.close()
+        os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         return Response(
-            '{"status": "error", "message": "FIRESTORE ERR: CONFLICT"}', 400
+            json.dumps({"status": "error", "message": f"FIRESTORE ERR: {e}"}), 400
         )
+
+    file_path = filename.split(".")[0]
+    file_ext = filename.split(".")[-1]
+
+    temp_file = open(os.path.join(app.config["UPLOAD_FOLDER"], filename), "rb")
+    s3OrigFileResponse = upload_file(
+        temp_file, os.getenv("AWS_BUCKET"), f"{file_path}/{filename}", file.mimetype
+    )
+    if s3OrigFileResponse is not True:
+        return Response(
+            json.dumps({"status": "error", "message": f"S3 ERR: {s3OrigFileResponse}"}),
+            500,
+        )
+    temp_file.close()
+
+    size = 24, 24
+    Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
+    Image.save(
+        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}")
+    )
+    Image.close()
+
+    temp_file = open(
+        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}"), "rb"
+    )
+    s3BlurFileResponse = upload_file(
+        temp_file,
+        os.getenv("AWS_BUCKET"),
+        f"{file_path}/{file_path}-24px.{file_ext}",
+        file.mimetype,
+    )
+    if s3BlurFileResponse is not True:
+        db.collection(os.getenv("PREFIX")).document(
+            request.files["file"].filename
+        ).delete()
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}")
+        return Response(
+            json.dumps({"status": "error", "message": f"S3 ERR: {s3BlurFileResponse}"}),
+            500,
+        )
+    temp_file.close()
+
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}"))
 
     return {"status": "ok", "message": "Uploaded"}
