@@ -1140,6 +1140,9 @@
   .static {
     position: static;
   }
+  .sticky {
+    position: sticky;
+  }
   .inset-0 {
     inset: calc(var(--spacing) * 0);
   }
@@ -1492,6 +1495,9 @@
       margin-left: e !important;
     }
   }
+  .mr-2 {
+    margin-right: calc(var(--spacing) * 2);
+  }
   .apexcharts-tooltip-title {
     .apexcharts-canvas .apexcharts-tooltip & {
       padding-top: 0.5rem !important;
@@ -1741,6 +1747,9 @@
   .w-128 {
     width: calc(var(--spacing) * 128);
   }
+  .w-\[296px\] {
+    width: 296px;
+  }
   .w-full {
     width: 100%;
   }
@@ -1949,6 +1958,9 @@
   }
   .overflow-y-auto {
     overflow-y: auto;
+  }
+  .rounded {
+    border-radius: 0.25rem;
   }
   .rounded-full {
     border-radius: calc(infinity * 1px);
@@ -2214,6 +2226,9 @@
   .bg-black\/75 {
     background-color: color-mix(in oklab, var(--color-black) 75%, transparent);
   }
+  .bg-blue-100 {
+    background-color: var(--color-blue-100);
+  }
   .bg-blue-700 {
     background-color: var(--color-blue-700);
   }
@@ -2443,8 +2458,14 @@
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
   .px-5 {
     padding-inline: calc(var(--spacing) * 5);
+  }
+  .py-0\.5 {
+    padding-block: calc(var(--spacing) * 0.5);
   }
   .py-1 {
     padding-block: calc(var(--spacing) * 1);
@@ -2664,6 +2685,9 @@
   }
   .text-blue-600 {
     color: var(--color-blue-600);
+  }
+  .text-blue-800 {
+    color: var(--color-blue-800);
   }
   .text-gray-200 {
     color: var(--color-gray-200);
@@ -2961,6 +2985,11 @@
       border-color: transparent;
     }
   }
+  .dark\:bg-blue-200 {
+    @media (prefers-color-scheme: dark) {
+      background-color: var(--color-blue-200);
+    }
+  }
   .dark\:bg-blue-600 {
     @media (prefers-color-scheme: dark) {
       background-color: var(--color-blue-600);
@@ -3004,6 +3033,11 @@
   .dark\:text-blue-500 {
     @media (prefers-color-scheme: dark) {
       color: var(--color-blue-500);
+    }
+  }
+  .dark\:text-blue-800 {
+    @media (prefers-color-scheme: dark) {
+      color: var(--color-blue-800);
     }
   }
   .dark\:text-gray-300 {

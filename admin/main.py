@@ -2,7 +2,7 @@ import json
 import PIL
 import PIL.Image
 import boto3.session
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, redirect, url_for
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 import os
@@ -63,7 +63,7 @@ def Home():
 
         objects.append({"name": name, "img": img, **obj, "date": date})
 
-    return render_template("Index.html", objects=objects, page_title="Home")
+    return render_template("Index.html", objects=objects, page_title="Home", s3_endpoint=os.getenv("AWS_ENDPOINT"), s3_bucket=os.getenv("AWS_BUCKET"))
 
 
 @app.route("/upload/")
@@ -217,3 +217,19 @@ def ApiUpload():
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}"))
 
     return {"status": "ok", "message": "Uploaded"}
+
+
+@app.route("/edit/<string:id>", methods=["GET"])
+def Edit(id):
+    document = db.collection(os.getenv("PREFIX")).document(id).get()
+    if document.exists:
+        name = document.id
+        img  = f"{document.id.split(".")[0]}/{document.id}"
+
+        obj = document.to_dict()
+        tags = obj["tags"]
+        urls = obj["urls"]
+        date = datetime.fromtimestamp(float(float(str(obj['date'])[:10]))).strftime("%d/%m/%Y")
+        return render_template("edit.html", name=name, img=img, tags=":".join(tags), urls=urls, date=date, page_title=f"Edit - {name}", s3_endpoint=os.getenv("AWS_ENDPOINT"), s3_bucket=os.getenv("AWS_BUCKET"))
+    else:
+        return redirect(url_for("Home"))
