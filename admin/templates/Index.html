@@ -78,6 +78,9 @@
                     <p>{{ object.date }}</p>
                     <p>{{ object.width }} x {{ object.height }}</p>
                 </div>
+                <p>
+                    {{ object.alt or "WARNING: NO ALT!" }}
+                </p>
                 {% if object.urls %}
                 <div class="flex gap-2 flex-wrap">
                     <p>urls:</p>
