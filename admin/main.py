@@ -249,6 +249,7 @@ def Edit(id):
         date = datetime.fromtimestamp(float(float(str(obj["date"])[:10]))).strftime(
             "%d/%m/%Y"
         )
+        alt=obj["alt"]
         return render_template(
             "edit.html",
             name=name,
@@ -256,6 +257,7 @@ def Edit(id):
             tags=":".join(tags),
             urls=urls,
             date=date,
+            alt=alt,
             page_title=f"Edit - {name}",
             s3_endpoint=os.getenv("AWS_ENDPOINT"),
             s3_bucket=os.getenv("AWS_BUCKET"),

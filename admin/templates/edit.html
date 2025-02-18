@@ -6,7 +6,7 @@
     enctype="multipart/form-data">
 
     <div class="flex flex-col gap-2">
-        <img src="{{ s3_endpoint }}/{{ s3_bucket }}/{{ img }}" alt="" class="w-[296px] object-scale-down rounded-lg" />
+        <img src="{{ s3_endpoint }}/{{ s3_bucket }}/{{ img }}" alt="" class="w-[296px] object-cover rounded-lg" />
         <div id="datepicker-inline" inline-datepicker datepicker-buttons datepicker-format="dd/mm/yyyy"
             datepicker-title="Shoot Date" data-date="{{ date }}"></div>
     </div>
@@ -33,6 +33,14 @@
                     value="{{ url.value }}" />
                 {% endfor %}
             </div>
+        </div>
+
+        <div class="w-full">
+            <label for="url-input"
+                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+            <textarea id="alt-text" rows="4" name="alt"
+                class="block p-2.5 text-sm text-gray-900 w-full h-full resize-none bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="Alt-Text" draggable="false">{{ alt }}</textarea>
         </div>
 
         <div class="w-full flex flex-wrap gap-2">
