@@ -13,6 +13,7 @@ import firebase_admin
 from firebase_admin import firestore, credentials
 from firebase_admin import exceptions as FB_EXCEPTION
 from google.api_core import exceptions as GOOGLE_EXCEPTION
+from datetime import datetime
 
 load_dotenv()
 UPLOAD_FOLDER = "./temp"
@@ -36,12 +37,33 @@ db = firestore.client()
 
 @app.route("/")
 def Home():
-    from urllib.request import urlopen
+    objects = []
 
-    print(urlopen("https://www.howsmyssl.com/a/check").read())
-    # objects = s3.list_objects(Bucket=os.getenv("AWS_BUCKET"))['Contents']
-    # return render_template("Index.html", objects=objects)
-    return render_template("Index.html", page_title="Home")
+    tag = request.args.get('tag')
+    if tag:
+        db_objects = (
+            db.collection(os.getenv("PREFIX"))
+            .where("tags", "array_contains", tag)
+            .order_by("date", direction=firestore.Query.DESCENDING)
+            .stream()
+        )
+    else:
+        db_objects = (
+            db.collection(os.getenv("PREFIX"))
+            .order_by("date", direction=firestore.Query.DESCENDING)
+            .stream()
+        )
+
+    for object in db_objects:
+        name = object.id
+        img  = f"{object.id.split(".")[0]}/{object.id}"
+
+        obj = object.to_dict()
+        date = datetime.fromtimestamp(float(float(str(obj['date'])[:10]))).strftime("%d/%m/%Y")
+
+        objects.append({"name": name, "img": img, **obj, "date": date})
+
+    return render_template("Index.html", objects=objects, page_title="Home")
 
 
 @app.route("/upload/")
@@ -138,7 +160,11 @@ def ApiUpload():
             },
             request.files["file"].filename,
         )
-    except (FB_EXCEPTION.ConflictError, FB_EXCEPTION.AlreadyExistsError, GOOGLE_EXCEPTION.AlreadyExists) as e:
+    except (
+        FB_EXCEPTION.ConflictError,
+        FB_EXCEPTION.AlreadyExistsError,
+        GOOGLE_EXCEPTION.AlreadyExists,
+    ) as e:
         Image.close()
         os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         return Response(

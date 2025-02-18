@@ -1,12 +1,135 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="flex gap-1 mb-4">
+    <button type="button" id="list-view-btn"
+        class="border focus:ring-4 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2  border-gray-500  text-gray-500 hover:text-white focus:ring-gray-800 hover:bg-gray-500">
+        <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-width="2"
+                d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5" />
+        </svg>
+        <span class="sr-only">List View</span>
+    </button>
+    <button type="button" id="grid-view-btn"
+        class="border focus:ring-4 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center me-2  border-gray-500  text-gray-500 hover:text-white focus:ring-gray-800 hover:bg-gray-500">
+        <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+                d="M4.857 3A1.857 1.857 0 0 0 3 4.857v4.286C3 10.169 3.831 11 4.857 11h4.286A1.857 1.857 0 0 0 11 9.143V4.857A1.857 1.857 0 0 0 9.143 3H4.857Zm10 0A1.857 1.857 0 0 0 13 4.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 9.143V4.857A1.857 1.857 0 0 0 19.143 3h-4.286Zm-10 10A1.857 1.857 0 0 0 3 14.857v4.286C3 20.169 3.831 21 4.857 21h4.286A1.857 1.857 0 0 0 11 19.143v-4.286A1.857 1.857 0 0 0 9.143 13H4.857Zm10 0A1.857 1.857 0 0 0 13 14.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 21 19.143v-4.286A1.857 1.857 0 0 0 19.143 13h-4.286Z"
+                clip-rule="evenodd" />
+        </svg>
+        <span class="sr-only">Grid View</span>
+    </button>
+</div>
 
+<div class="flex-col gap-4 hidden" id="list-view">
+    {% for object in objects %}
+    <div class="flex gap-4 rounded-lg bg-slate-800 p-2 w-full min-h-32 items-start">
+        <a href="/edit/{{ object.name }}" class="hover:underline">
+            <img src="https://s3.tebi.io/radiquum-photos/{{ object.img }}" alt=""
+                class="max-w-32 rounded-lg object-scale-down" />
+        </a>
+        <div class="flex flex-col gap-2">
+            <a href="/edit/{{ object.name }}" class="hover:underline">
+                <div>
+                    <p class="text-sm text-gray-400">{{ object.date }}</p>
+                    <p class="text-xl -mt-1">{{ object.name }}</p>
+                    <p class="text-sm text-gray-400">{{ object.width }} x {{ object.height }}</p>
+                </div>
+            </a>
+            <p>{{ object.alt or "WARNING: NO ALT!" }}</p>
+            {% if object.urls %}
+            <div class="flex gap-3 flex-wrap">
+                <p>urls:</p>
+                {% for url in object.urls %}
+                <a href="{{ url.value }}" class="text-blue-300 hover:text-blue-500 hover:underline">{{ url.name }}</a>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if object.tags %}
+            <div class="flex gap-1 flex-wrap">
+                {% for tag in object.tags %}
+                <a href="{{ url_for('Home') }}?tag={{ tag }}" class="hover:underline">
+                    <div class="bg-slate-900 rounded-lg px-2 py-1">
+                        #{{ tag }}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
+<div class="gap-4 hidden grid-cols-3" id="grid-view">
+    {% for object in objects %}
+    <div class="w-full h-128 bg-slate-800 p-2 relative">
+        <a href="/edit/{{ object.name }}">
+            <img class="absolute w-full h-full inset-0 object-cover"
+                src="https://s3.tebi.io/radiquum-photos/{{ object.img }}" alt="" />
+        </a>
+        <div
+            class="absolute bottom-0 left-0 w-full px-2 pb-2 pt-16 bg-gradient-to-t from-black/90 to-transparent to-95%">
+            <div>
+                <p class="text-xl -mt-1">{{ object.name }}</p>
+                <div class="flex gap-2 text-gray-300 text-sm">
+                    <p>{{ object.date }}</p>
+                    <p>{{ object.width }} x {{ object.height }}</p>
+                </div>
+                {% if object.urls %}
+                <div class="flex gap-2 flex-wrap">
+                    <p>urls:</p>
+                    {% for url in object.urls %}
+                    <a href="{{ url.value }}" class="text-blue-300 hover:text-blue-500 hover:underline">{{ url.name
+                        }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if object.tags %}
+                <div class="flex gap-2 flex-wrap">
+                    {% for tag in object.tags %}
+                    <a href="{{ url_for('Home') }}?tag={{ tag }}" class="hover:underline">#{{ tag }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
-<!-- {% for object in objects %}
-<img src="https://s3.tebi.io/radiquum-photos/{{ object['Key'] }}" />
-<p>{{ object['Key'] }}</p>
-{% endfor %} -->
+<script>
+
+    const listView = document.getElementById('list-view')
+    const gridView = document.getElementById('grid-view')
+
+    const listViewBtn = document.getElementById('list-view-btn')
+    const gridViewBtn = document.getElementById('grid-view-btn')
+
+    let view = localStorage.getItem('view') || 'list'
+    if (view === 'list') {
+        listView.classList.remove('hidden')
+        listView.classList.add('flex')
+    } else if (view === 'grid') {
+        gridView.classList.remove('hidden')
+        gridView.classList.add('grid')
+    }
+
+    listViewBtn.addEventListener('click', () => {
+        listView.classList.remove('hidden')
+        listView.classList.add('flex')
+        gridView.classList.add('hidden')
+        localStorage.setItem('view', 'list')
+    })
+    gridViewBtn.addEventListener('click', () => {
+        gridView.classList.remove('hidden')
+        gridView.classList.add('grid')
+        listView.classList.add('hidden')
+        localStorage.setItem('view', 'grid')
+    })
+
+</script>
 
 {% endblock %}

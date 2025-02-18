@@ -94,7 +94,7 @@
     tagInp.addEventListener('input', (e) => {
         if (e.target.value.includes(',')) {
             const tag = e.target.value.split(',')[0].trim().replaceAll(" ", "_").toLowerCase();
-            if (tags.includes(tag)) {
+            if (tags.includes(tag) || !tag) {
                 tagInp.value = '';
                 return;
             };
