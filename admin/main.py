@@ -56,8 +56,8 @@ def Home():
 
     for object in db_objects:
         name = object.id
-        path = name.split('.')[0]
-        ext = name.split('.')[-1]
+        path = name.split(".")[0]
+        ext = name.split(".")[-1]
         img = f"{path}/{path}-512.{ext}"
 
         obj = object.to_dict()
@@ -199,9 +199,7 @@ def ApiUpload():
 
     size = 512, 512
     Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
-    Image.save(
-        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}")
-    )
+    Image.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"))
     Image.close()
 
     temp_file = open(
@@ -218,7 +216,10 @@ def ApiUpload():
             request.files["file"].filename
         ).delete()
         s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
-        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{file_path}-512.{file_ext}")
+        s3.delete_object(
+            Bucket=os.getenv("AWS_BUCKET"),
+            Key=f"{file_path}/{file_path}-512.{file_ext}",
+        )
         s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
         return Response(
             json.dumps({"status": "error", "message": f"S3 ERR: {s3BlurFileResponse}"}),
@@ -237,8 +238,8 @@ def Edit(id):
     document = db.collection(os.getenv("PREFIX")).document(id).get()
     if document.exists:
         name = document.id
-        path = name.split('.')[0]
-        ext = name.split('.')[-1]
+        path = name.split(".")[0]
+        ext = name.split(".")[-1]
         img = f"{path}/{path}-512.{ext}"
 
         obj = document.to_dict()
@@ -249,7 +250,7 @@ def Edit(id):
         date = datetime.fromtimestamp(float(float(str(obj["date"])[:10]))).strftime(
             "%d/%m/%Y"
         )
-        alt=obj["alt"]
+        alt = obj["alt"]
         return render_template(
             "edit.html",
             name=name,
@@ -273,6 +274,30 @@ def ApiDelete(file):
 
     db.collection(os.getenv("PREFIX")).document(file).delete()
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file}")
-    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-512.{file_ext}")
+    s3.delete_object(
+        Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-512.{file_ext}"
+    )
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/")
     return Response(json.dumps({"status": "ok", "message": f"deleted {file}"}), 200)
+
+
+@app.route("/api/edit/<string:file>", methods=["PUT"])
+def ApiUpdate(file):
+    tags = request.form.get("tags").split(",") or []
+    if not tags or tags == "" or tags[0] == "":
+        tags = []
+    urls = []
+    for url in request.form.get("urls").split(";"):
+        if url == "":
+            continue
+        urls.append(json.loads(url))
+
+    db.collection(os.getenv("PREFIX")).document(file).update(
+        {
+            "alt": request.form.get("alt"),
+            "date": int(request.form.get("date")),
+            "tags": tags,
+            "urls": urls,
+        }
+    )
+    return Response(json.dumps({"status": "ok", "message": f"updated {file}"}), 200)

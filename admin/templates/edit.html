@@ -188,77 +188,62 @@
 
     });
 
-    // btnReset.addEventListener('click', () => {
-    //     tagInp.value = '';
-    //     tagCon.innerHTML = '';
-    //     tags = [];
-    //     urlInp.value = '';
-    //     urlCon.innerHTML = '';
-    //     urls = [];
-    //     datepicker.setDate("today");
-    // });
+    const form = document.getElementById('upload-form');
+    form.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Prevent form submission
+        }
+    });
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
 
-    // const form = document.getElementById('upload-form');
-    // form.addEventListener('keydown', (e) => {
-    //     if (e.key === "Enter") {
-    //         e.preventDefault(); // Prevent form submission
-    //     }
-    // });
-    // form.addEventListener('submit', (e) => {
-    //     e.preventDefault();
+        const formFields = form.elements;
+        const formData = new FormData(form);
+        if (!datepicker.getDate()) {
+            alert('Please select a date');
+            return;
+        }
 
-    //     const formFields = form.elements;
-    //     const formData = new FormData(form);
-    //     if (!formFields['file'].files.length > 0) {
-    //         alert('Please select a file');
-    //         return;
-    //     }
-    //     if (!datepicker.getDate()) {
-    //         alert('Please select a date');
-    //         return;
-    //     }
+        let convertedUrls = "";
+        urls.forEach(url => {
+            convertedUrls += `{"name":"${url.name}","value":"${url.value}"};`;
+        });
+        formData.set('alt', formFields['alt'].value.trim());
+        formData.append('tags', tags.toString());
+        formData.append('urls', convertedUrls.toString());
+        formData.append('date', datepicker.getDatepickerInstance().picker.viewDate);
 
-    //     let convertedUrls = "";
-    //     urls.forEach(url => {
-    //         convertedUrls += `{"name":"${url.name}","value":"${url.value}"};`;
-    //     });
-    //     formData.set('file', formFields['file'].files[0]);
-    //     formData.set('alt', formFields['alt'].value.trim());
-    //     formData.append('tags', tags.toString());
-    //     formData.append('urls', convertedUrls.toString());
-    //     formData.append('date', datepicker.getDatepickerInstance().picker.viewDate);
+        for (let pair of formData.entries()) {
+            if (pair[0] == "urls") {
+                console.log(`${pair[0]}:`, urls);
+            } else {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
+        }
 
-    //     for (let pair of formData.entries()) {
-    //         if (pair[0] == "urls") {
-    //             console.log(`${pair[0]}:`, urls);
-    //         } else {
-    //             console.log(`${pair[0]}: ${pair[1]}`);
-    //         }
-    //     }
+        btnSubmit.setAttribute('disabled', true);
 
-    //     btnSubmit.setAttribute('disabled', true);
-
-    //     fetch('{{ url_for("ApiUpload") }}', {
-    //         method: 'POST',
-    //         body: formData
-    //     })
-    //         .then(res => {
-    //             return res.json();
-    //         })
-    //         .then(data => {
-    //             console.log(data);
-    //             btnSubmit.removeAttribute('disabled');
-    //             alert(data.message);
-    //             if (data.status != "error") {
-    //                 window.location.href = "{{ url_for('Home') }}";
-    //             }
-    //         })
-    //         .catch(err => {
-    //             console.log(err);
-    //             btnSubmit.removeAttribute('disabled');
-    //             alert(err.message);
-    //         })
-    // });
+        fetch('{{ url_for("ApiUpdate", file=name) }}', {
+            method: 'PUT',
+            body: formData
+        })
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                console.log(data);
+                btnSubmit.removeAttribute('disabled');
+                alert(data.message);
+                if (data.status != "error") {
+                    window.location.href = "{{ url_for('Home') }}";
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                btnSubmit.removeAttribute('disabled');
+                alert(err.message);
+            })
+    });
 
 </script>
 
