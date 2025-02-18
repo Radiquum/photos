@@ -195,20 +195,20 @@ def ApiUpload():
         )
     temp_file.close()
 
-    size = 24, 24
+    size = 512, 512
     Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
     Image.save(
-        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}")
+        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}")
     )
     Image.close()
 
     temp_file = open(
-        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}"), "rb"
+        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"), "rb"
     )
     s3BlurFileResponse = upload_file(
         temp_file,
         os.getenv("AWS_BUCKET"),
-        f"{file_path}/{file_path}-24px.{file_ext}",
+        f"{file_path}/{file_path}-512.{file_ext}",
         file.mimetype,
     )
     if s3BlurFileResponse is not True:
@@ -216,7 +216,7 @@ def ApiUpload():
             request.files["file"].filename
         ).delete()
         s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
-        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{file_path}-24px.{file_ext}")
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{file_path}-512.{file_ext}")
         s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
         return Response(
             json.dumps({"status": "error", "message": f"S3 ERR: {s3BlurFileResponse}"}),
@@ -225,7 +225,7 @@ def ApiUpload():
     temp_file.close()
 
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-24px.{file_ext}"))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"))
 
     return {"status": "ok", "message": "Uploaded"}
 
@@ -267,6 +267,6 @@ def ApiDelete(file):
 
     db.collection(os.getenv("PREFIX")).document(file).delete()
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file}")
-    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-24px.{file_ext}")
+    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-512.{file_ext}")
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/")
     return Response(json.dumps({"status": "ok", "message": f"deleted {file}"}), 200)
