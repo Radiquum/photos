@@ -47,6 +47,9 @@
 <script>
 
     let tags = "{{ tags }}".split(':') || [];
+    if (tags[0] == '') {
+        tags = [];
+    }
     let urls = [];
     let datepicker = null;
 
@@ -154,6 +157,28 @@
 
     const btnDelete = document.getElementById('btn-delete');
     const btnSubmit = document.getElementById('btn-submit');
+
+    btnDelete.addEventListener('click', () => {
+        if (confirm('Are you sure you want to delete this post?')) {
+
+            fetch(`{{ url_for('ApiDelete', file=name) }}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "{{url_for('Home')}}";
+                })
+                .catch(err => {
+                    console.log(err);
+                    alert(err.message);
+                });
+        }
+
+    });
 
     // btnReset.addEventListener('click', () => {
     //     tagInp.value = '';

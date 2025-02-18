@@ -39,7 +39,7 @@ db = firestore.client()
 def Home():
     objects = []
 
-    tag = request.args.get('tag')
+    tag = request.args.get("tag")
     if tag:
         db_objects = (
             db.collection(os.getenv("PREFIX"))
@@ -56,14 +56,22 @@ def Home():
 
     for object in db_objects:
         name = object.id
-        img  = f"{object.id.split(".")[0]}/{object.id}"
+        img = f"{object.id.split(".")[0]}/{object.id}"
 
         obj = object.to_dict()
-        date = datetime.fromtimestamp(float(float(str(obj['date'])[:10]))).strftime("%d/%m/%Y")
+        date = datetime.fromtimestamp(float(float(str(obj["date"])[:10]))).strftime(
+            "%d/%m/%Y"
+        )
 
         objects.append({"name": name, "img": img, **obj, "date": date})
 
-    return render_template("Index.html", objects=objects, page_title="Home", s3_endpoint=os.getenv("AWS_ENDPOINT"), s3_bucket=os.getenv("AWS_BUCKET"))
+    return render_template(
+        "Index.html",
+        objects=objects,
+        page_title="Home",
+        s3_endpoint=os.getenv("AWS_ENDPOINT"),
+        s3_bucket=os.getenv("AWS_BUCKET"),
+    )
 
 
 @app.route("/upload/")
@@ -125,7 +133,9 @@ def upload_file(file, bucket, key, mimetype) -> bool | Exception:
 
 @app.route("/api/upload/", methods=["POST"])
 def ApiUpload():
-    tags = request.form.get("tags").split(",")
+    tags = request.form.get("tags").split(",") or []
+    if not tags or tags == "" or tags[0] == "":
+        tags = []
     urls = []
     for url in request.form.get("urls").split(";"):
         if url == "":
@@ -206,7 +216,8 @@ def ApiUpload():
             request.files["file"].filename
         ).delete()
         s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
-        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}")
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{file_path}-24px.{file_ext}")
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
         return Response(
             json.dumps({"status": "error", "message": f"S3 ERR: {s3BlurFileResponse}"}),
             500,
@@ -224,12 +235,38 @@ def Edit(id):
     document = db.collection(os.getenv("PREFIX")).document(id).get()
     if document.exists:
         name = document.id
-        img  = f"{document.id.split(".")[0]}/{document.id}"
+        img = f"{document.id.split(".")[0]}/{document.id}"
 
         obj = document.to_dict()
         tags = obj["tags"]
+        if not tags or tags == "" or tags[0] == "":
+            tags = []
         urls = obj["urls"]
-        date = datetime.fromtimestamp(float(float(str(obj['date'])[:10]))).strftime("%d/%m/%Y")
-        return render_template("edit.html", name=name, img=img, tags=":".join(tags), urls=urls, date=date, page_title=f"Edit - {name}", s3_endpoint=os.getenv("AWS_ENDPOINT"), s3_bucket=os.getenv("AWS_BUCKET"))
+        date = datetime.fromtimestamp(float(float(str(obj["date"])[:10]))).strftime(
+            "%d/%m/%Y"
+        )
+        return render_template(
+            "edit.html",
+            name=name,
+            img=img,
+            tags=":".join(tags),
+            urls=urls,
+            date=date,
+            page_title=f"Edit - {name}",
+            s3_endpoint=os.getenv("AWS_ENDPOINT"),
+            s3_bucket=os.getenv("AWS_BUCKET"),
+        )
     else:
         return redirect(url_for("Home"))
+
+
+@app.route("/api/delete/<string:file>", methods=["DELETE"])
+def ApiDelete(file):
+    file_name = file.split(".")[0]
+    file_ext = file.split(".")[-1]
+
+    db.collection(os.getenv("PREFIX")).document(file).delete()
+    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file}")
+    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-24px.{file_ext}")
+    s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/")
+    return Response(json.dumps({"status": "ok", "message": f"deleted {file}"}), 200)
