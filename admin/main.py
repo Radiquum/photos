@@ -56,7 +56,9 @@ def Home():
 
     for object in db_objects:
         name = object.id
-        img = f"{object.id.split(".")[0]}/{object.id}"
+        path = name.split('.')[0]
+        ext = name.split('.')[-1]
+        img = f"{path}/{path}-512.{ext}"
 
         obj = object.to_dict()
         date = datetime.fromtimestamp(float(float(str(obj["date"])[:10]))).strftime(
@@ -235,7 +237,9 @@ def Edit(id):
     document = db.collection(os.getenv("PREFIX")).document(id).get()
     if document.exists:
         name = document.id
-        img = f"{document.id.split(".")[0]}/{document.id}"
+        path = name.split('.')[0]
+        ext = name.split('.')[-1]
+        img = f"{path}/{path}-512.{ext}"
 
         obj = document.to_dict()
         tags = obj["tags"]
