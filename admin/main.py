@@ -19,6 +19,13 @@ load_dotenv()
 UPLOAD_FOLDER = "./temp"
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
 
+SIZES = [
+    (2048, 2048),
+    (1024, 1024),
+    (512, 512),
+    (256, 256),
+]
+
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
@@ -158,6 +165,9 @@ def ApiUpload():
             '{"status": "error", "message": "FLASK ERR: UNSUPPORTED EXTENSION"}', 500
         )
 
+    file_path = filename.split(".")[0]
+    file_ext = filename.split(".")[-1]
+
     Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
     try:
         db.collection(os.getenv("PREFIX")).add(
@@ -182,53 +192,72 @@ def ApiUpload():
         return Response(
             json.dumps({"status": "error", "message": f"FIRESTORE ERR: {e}"}), 400
         )
-
-    file_path = filename.split(".")[0]
-    file_ext = filename.split(".")[-1]
+    Image.close()
 
     temp_file = open(os.path.join(app.config["UPLOAD_FOLDER"], filename), "rb")
     s3OrigFileResponse = upload_file(
         temp_file, os.getenv("AWS_BUCKET"), f"{file_path}/{filename}", file.mimetype
     )
     if s3OrigFileResponse is not True:
+        db.collection(os.getenv("PREFIX")).document(
+            request.files["file"].filename
+        ).delete()
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
+        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
         return Response(
             json.dumps({"status": "error", "message": f"S3 ERR: {s3OrigFileResponse}"}),
             500,
         )
     temp_file.close()
 
-    size = 512, 512
-    Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
-    Image.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"))
-    Image.close()
+    for size in SIZES:
+        Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
+        Image.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"))
+        Image.close()
 
-    temp_file = open(
-        os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"), "rb"
-    )
-    s3BlurFileResponse = upload_file(
-        temp_file,
-        os.getenv("AWS_BUCKET"),
-        f"{file_path}/{file_path}-512.{file_ext}",
-        file.mimetype,
-    )
-    if s3BlurFileResponse is not True:
-        db.collection(os.getenv("PREFIX")).document(
-            request.files["file"].filename
-        ).delete()
-        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
-        s3.delete_object(
-            Bucket=os.getenv("AWS_BUCKET"),
-            Key=f"{file_path}/{file_path}-512.{file_ext}",
+        temp_file = open(
+            os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"), "rb"
         )
-        s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
-        return Response(
-            json.dumps({"status": "error", "message": f"S3 ERR: {s3BlurFileResponse}"}),
-            500,
+        s3Response = upload_file(
+            temp_file,
+            os.getenv("AWS_BUCKET"),
+            f"{file_path}/{file_path}-{size[0]}.{file_ext}",
+            file.mimetype,
         )
-    temp_file.close()
+        if s3Response is not True:
+            db.collection(os.getenv("PREFIX")).document(
+                request.files["file"].filename
+            ).delete()
+            s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
+            s3.delete_object(
+                Bucket=os.getenv("AWS_BUCKET"),
+                Key=f"{file_path}/{file_path}-{SIZES[0][0]}.{file_ext}",
+            )
+            s3.delete_object(
+                Bucket=os.getenv("AWS_BUCKET"),
+                Key=f"{file_path}/{file_path}-{SIZES[1][0]}.{file_ext}",
+            )
+            s3.delete_object(
+                Bucket=os.getenv("AWS_BUCKET"),
+                Key=f"{file_path}/{file_path}-{SIZES[2][0]}.{file_ext}",
+            )
+            s3.delete_object(
+                Bucket=os.getenv("AWS_BUCKET"),
+                Key=f"{file_path}/{file_path}-{SIZES[3][0]}.{file_ext}",
+            )
+            s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
+            return Response(
+                json.dumps({"status": "error", "message": f"S3 ERR: {s3Response}"}),
+                500,
+            )
+        temp_file.close()
 
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-512.{file_ext}"))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[0][0]}.{file_ext}"))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[1][0]}.{file_ext}"))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[2][0]}.{file_ext}"))
+    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[3][0]}.{file_ext}"))
 
     return {"status": "ok", "message": "Uploaded"}
 
