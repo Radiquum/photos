@@ -212,11 +212,18 @@ def ApiUpload():
     for size in SIZES:
         Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
         Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
-        Image.save(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"))
+        Image.save(
+            os.path.join(
+                app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"
+            )
+        )
         Image.close()
 
         temp_file = open(
-            os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"), "rb"
+            os.path.join(
+                app.config["UPLOAD_FOLDER"], f"{file_path}-{size[0]}.{file_ext}"
+            ),
+            "rb",
         )
         s3Response = upload_file(
             temp_file,
@@ -228,7 +235,9 @@ def ApiUpload():
             db.collection(os.getenv("PREFIX")).document(
                 request.files["file"].filename
             ).delete()
-            s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}")
+            s3.delete_object(
+                Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/{filename}"
+            )
             s3.delete_object(
                 Bucket=os.getenv("AWS_BUCKET"),
                 Key=f"{file_path}/{file_path}-{SIZES[0][0]}.{file_ext}",
@@ -249,9 +258,21 @@ def ApiUpload():
         temp_file.close()
 
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[0][0]}.{file_ext}"))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[1][0]}.{file_ext}"))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[2][0]}.{file_ext}"))
+    os.remove(
+        os.path.join(
+            app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[0][0]}.{file_ext}"
+        )
+    )
+    os.remove(
+        os.path.join(
+            app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[1][0]}.{file_ext}"
+        )
+    )
+    os.remove(
+        os.path.join(
+            app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[2][0]}.{file_ext}"
+        )
+    )
 
     return {"status": "ok", "message": "Uploaded"}
 
@@ -299,6 +320,18 @@ def ApiDelete(file):
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file}")
     s3.delete_object(
         Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-512.{file_ext}"
+    )
+    s3.delete_object(
+        Bucket=os.getenv("AWS_BUCKET"),
+        Key=f"{file_name}/{file_name}-{SIZES[0][0]}.{file_ext}",
+    )
+    s3.delete_object(
+        Bucket=os.getenv("AWS_BUCKET"),
+        Key=f"{file_name}/{file_name}-{SIZES[1][0]}.{file_ext}",
+    )
+    s3.delete_object(
+        Bucket=os.getenv("AWS_BUCKET"),
+        Key=f"{file_name}/{file_name}-{SIZES[2][0]}.{file_ext}",
     )
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/")
     return Response(json.dumps({"status": "ok", "message": f"deleted {file}"}), 200)
