@@ -35,7 +35,6 @@ export interface Url {
 }
 
 interface ThumbnailSize {
-  "256": string;
   "512": string;
   "1024": string;
   "2048": string;
@@ -94,7 +93,6 @@ if (
           id: doc.id,
           image: `${ENDPOINT}/${BUCKET}/${path}/${path}.${ext}`,
           thumbnail: {
-            "256": `${ENDPOINT}/${BUCKET}/${path}/${path}-256.${ext}`,
             "512": `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
             "1024": `${ENDPOINT}/${BUCKET}/${path}/${path}-1024.${ext}`,
             "2048": `${ENDPOINT}/${BUCKET}/${path}/${path}-2048.${ext}`

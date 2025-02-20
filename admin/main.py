@@ -23,7 +23,6 @@ SIZES = [
     (2048, 2048),
     (1024, 1024),
     (512, 512),
-    (256, 256),
 ]
 
 app = Flask(__name__)
@@ -242,10 +241,6 @@ def ApiUpload():
                 Bucket=os.getenv("AWS_BUCKET"),
                 Key=f"{file_path}/{file_path}-{SIZES[2][0]}.{file_ext}",
             )
-            s3.delete_object(
-                Bucket=os.getenv("AWS_BUCKET"),
-                Key=f"{file_path}/{file_path}-{SIZES[3][0]}.{file_ext}",
-            )
             s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_path}/")
             return Response(
                 json.dumps({"status": "error", "message": f"S3 ERR: {s3Response}"}),
@@ -257,7 +252,6 @@ def ApiUpload():
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[0][0]}.{file_ext}"))
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[1][0]}.{file_ext}"))
     os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[2][0]}.{file_ext}"))
-    os.remove(os.path.join(app.config["UPLOAD_FOLDER"], f"{file_path}-{SIZES[3][0]}.{file_ext}"))
 
     return {"status": "ok", "message": "Uploaded"}
 
