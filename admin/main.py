@@ -319,9 +319,6 @@ def ApiDelete(file):
     db.collection(os.getenv("PREFIX")).document(file).delete()
     s3.delete_object(Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file}")
     s3.delete_object(
-        Bucket=os.getenv("AWS_BUCKET"), Key=f"{file_name}/{file_name}-512.{file_ext}"
-    )
-    s3.delete_object(
         Bucket=os.getenv("AWS_BUCKET"),
         Key=f"{file_name}/{file_name}-{SIZES[0][0]}.{file_ext}",
     )

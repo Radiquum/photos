@@ -116,13 +116,6 @@ if (
   items = JSON.parse(fs.readFileSync("data/items.json", "utf-8"));
 }
 
-// const ordered = Object.keys(items)
-//   .sort().reverse()
-//   .reduce((obj, key) => {
-//     obj[key] = items[key];
-//     return obj;
-//   }, {} as typeof items);
-
 Object.keys(items).forEach((year) => {
   items[year].sort((a, b) => b.date - a.date);
 });
@@ -169,7 +162,3 @@ if (ENVIRONMENT == "dev") {
 }
 fs.writeFileSync("out/index.html", `<!DOCTYPE html />${html}`);
 log.info("Build finished!");
-
-// console.log(await db.collection("images").count().get().then((snapshot) => {
-//     return snapshot.data().count;
-// }));
