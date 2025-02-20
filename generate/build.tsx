@@ -7,6 +7,7 @@ import fs from "fs";
 import exec from "child_process";
 import Base from "./templates/Base";
 import Header from "./templates/Header";
+import YearPhotos from "./templates/YearPhotos";
 
 const log = new Log();
 
@@ -17,6 +18,9 @@ if (!process.env.FIREBASE_COLLECTION) {
   throw new Error("FIREBASE_COLLECTION is not set");
 }
 
+const ENDPOINT = process.env.AWS_ENDPOINT || "";
+const BUCKET = process.env.AWS_BUCKET || "";
+
 const ENVIRONMENT = process.env.ENVIRONMENT || "prod";
 
 const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT as string);
@@ -25,13 +29,15 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-interface Url {
+export interface Url {
   name: string;
   value: string;
 }
 
-interface Image {
+export interface Image {
   id: string;
+  image: string;
+  thumbnail: string;
   alt: string;
   tags: string[];
   urls: Url[];
@@ -41,10 +47,10 @@ interface Image {
   date: number;
 }
 
-type Years = Record<string, Image[]>;
+export type Years = Record<string, Image[]>;
 
 let tags: string[] = [];
-let items: Years = {};
+let items: Record<string, Image[]> = {};
 
 function addTag(tag: string) {
   if (tags.includes(tag)) {
@@ -64,7 +70,7 @@ if (
     .get()
     .then((snapshot) => {
       snapshot.forEach((doc) => {
-        const data = doc.data();
+        const data = doc.data() as Image;
         data.tags.forEach((tag: string) => {
           addTag(tag);
         });
@@ -74,8 +80,13 @@ if (
           items[year] = [];
         }
 
+        const ext = doc.id.split(".").pop() as string;
+        const path = doc.id.split(".")[0] as string;
+
         items[year].push({
           id: doc.id,
+          image: `${ENDPOINT}/${BUCKET}/${path}/${path}.${ext}`,
+          thumbnail: `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
           alt: data.alt,
           tags: data.tags,
           urls: data.urls,
@@ -95,9 +106,29 @@ if (
   items = JSON.parse(fs.readFileSync("data/items.json", "utf-8"));
 }
 
+// const ordered = Object.keys(items)
+//   .sort().reverse()
+//   .reduce((obj, key) => {
+//     obj[key] = items[key];
+//     return obj;
+//   }, {} as typeof items);
+
+Object.keys(items).forEach((year) => {
+  items[year].sort((a, b) => b.date - a.date);
+});
+
 const html = renderToString(
   <Base isDev={ENVIRONMENT == "dev"}>
     <Header />
+    <div className="container mx-auto p-4">
+      {Object.keys(items).sort().reverse().map((year) => (
+        <YearPhotos
+          year={year}
+          images={items[year]}
+          key={`${year}-container`}
+        />
+      ))}
+    </div>
   </Base>
 );
 

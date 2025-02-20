@@ -44,7 +44,7 @@ function onExit() {
   process.exit(0);
 }
 
-const watcher = chokidar.watch(["./templates", "./build.tsx"], {
+const watcher = chokidar.watch(["./templates", "./build.tsx", "./static"], {
   ignored: (filePath, stats) => filePath.endsWith("watch.ts"),
   atomic: true,
   awaitWriteFinish: true,
