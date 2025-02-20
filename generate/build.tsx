@@ -34,10 +34,17 @@ export interface Url {
   value: string;
 }
 
+interface ThumbnailSize {
+  "256": string;
+  "512": string;
+  "1024": string;
+  "2048": string;
+}
+
 export interface Image {
   id: string;
   image: string;
-  thumbnail: string;
+  thumbnail: ThumbnailSize;
   alt: string;
   tags: string[];
   urls: Url[];
@@ -86,7 +93,12 @@ if (
         items[year].push({
           id: doc.id,
           image: `${ENDPOINT}/${BUCKET}/${path}/${path}.${ext}`,
-          thumbnail: `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
+          thumbnail: {
+            "256": `${ENDPOINT}/${BUCKET}/${path}/${path}-256.${ext}`,
+            "512": `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
+            "1024": `${ENDPOINT}/${BUCKET}/${path}/${path}-1024.${ext}`,
+            "2048": `${ENDPOINT}/${BUCKET}/${path}/${path}-2048.${ext}`
+          },
           alt: data.alt,
           tags: data.tags,
           urls: data.urls,

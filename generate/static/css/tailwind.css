@@ -533,6 +533,12 @@
   .static {
     position: static;
   }
+  .\[grid-column\:span_2\] {
+    grid-column: span 2;
+  }
+  .\[grid-row\:span_2\] {
+    grid-row: span 2;
+  }
   .container {
     width: 100%;
     @media (width >= 40rem) {
@@ -563,6 +569,9 @@
   .flex {
     display: flex;
   }
+  .grid {
+    display: grid;
+  }
   .hidden {
     display: none;
   }
@@ -577,6 +586,15 @@
   }
   .table {
     display: table;
+  }
+  .aspect-\[1\/2\] {
+    aspect-ratio: 1/2;
+  }
+  .aspect-\[2\/1\] {
+    aspect-ratio: 2/1;
+  }
+  .aspect-square {
+    aspect-ratio: 1 / 1;
   }
   .h-16 {
     height: calc(var(--spacing) * 16);
@@ -599,8 +617,20 @@
   .resize {
     resize: both;
   }
+  .grid-flow-row-dense {
+    grid-auto-flow: row dense;
+  }
+  .grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
   .items-center {
     align-items: center;
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
   }
   .gap-4 {
     gap: calc(var(--spacing) * 4);

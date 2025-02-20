@@ -33,10 +33,9 @@ export default function Base({ children, isDev }: BaseProps) {
         <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/plugins/fullscreen/lg-fullscreen.min.js"></script>
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lightgallery.min.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-thumbnail.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-share.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-thumbnail.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-zoom.min.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-transitions.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-fullscreen.min.css" />
 
       </head>
