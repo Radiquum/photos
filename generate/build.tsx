@@ -6,6 +6,7 @@ import { renderToString } from "react-dom/server";
 import fs from "fs";
 import exec from "child_process";
 import Base from "./templates/Base";
+import Header from "./templates/Header";
 
 const log = new Log();
 
@@ -40,8 +41,10 @@ interface Image {
   date: number;
 }
 
-const tags: string[] = [];
-const items: Image[] = [];
+type Years = Record<string, Image[]>;
+
+let tags: string[] = [];
+let items: Years = {};
 
 function addTag(tag: string) {
   if (tags.includes(tag)) {
@@ -50,31 +53,51 @@ function addTag(tag: string) {
   tags.push(tag);
 }
 
-await db
-  .collection(process.env.FIREBASE_COLLECTION as string)
-  .get()
-  .then((snapshot) => {
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      data.tags.forEach((tag: string) => {
-        addTag(tag);
-      });
-      items.push({
-        id: doc.id,
-        alt: data.alt,
-        tags: data.tags,
-        urls: data.urls,
-        mimetype: data.mimetype,
-        width: data.width,
-        height: data.height,
-        date: data.date,
+if (
+  !fs.existsSync("data") ||
+  !fs.existsSync("data/tags.json") ||
+  !fs.existsSync("data/items.json")
+) {
+  log.warn("data/tags.json or data/items.json does not exist");
+  await db
+    .collection(process.env.FIREBASE_COLLECTION as string)
+    .get()
+    .then((snapshot) => {
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        data.tags.forEach((tag: string) => {
+          addTag(tag);
+        });
+
+        const year: string = new Date(data.date).getFullYear().toString();
+        if (!(year in items)) {
+          items[year] = [];
+        }
+
+        items[year].push({
+          id: doc.id,
+          alt: data.alt,
+          tags: data.tags,
+          urls: data.urls,
+          mimetype: data.mimetype,
+          width: data.width,
+          height: data.height,
+          date: data.date,
+        });
       });
     });
-  });
+  if (!fs.existsSync("data")) fs.mkdirSync("data");
+  fs.writeFileSync("data/tags.json", JSON.stringify(tags));
+  fs.writeFileSync("data/items.json", JSON.stringify(items));
+} else {
+  log.warn("using cached data");
+  tags = JSON.parse(fs.readFileSync("data/tags.json", "utf-8"));
+  items = JSON.parse(fs.readFileSync("data/items.json", "utf-8"));
+}
 
 const html = renderToString(
   <Base isDev={ENVIRONMENT == "dev"}>
-    <p>Paragraph.</p>
+    <Header />
   </Base>
 );
 
