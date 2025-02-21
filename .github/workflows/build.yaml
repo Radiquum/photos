@@ -46,7 +46,7 @@ jobs:
         run: "bun install"
         working-directory: ./generate
       - name: Build website
-        run: "bun run gen"
+        run: "bun run build.tsx"
         working-directory: ./generate
         env:
           AWS_ENDPOINT: ${{ secrets.AWS_ENDPOINT }}
