@@ -46,6 +46,18 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
               data-download-url={image.image}
               data-type="image"
               data-tags={image.tags.join(",")}
+              data-facebook-text={image.alt || "Photo by @radiquum"}
+              data-pinterest-text={image.alt || "Photo by @radiquum"}
+              data-tweet-text={image.alt || "Photo by @radiquum"}
+              data-reddit-text={image.alt || "Photo by @radiquum"}
+              data-bsky-text={image.alt || "Photo by @radiquum.wah.su"}
+              data-ms-text={image.alt || "Photo by @radiquum@furry.engineer"}
+              data-facebook-share-url={image.image}
+              data-twitter-share-url={image.image}
+              data-pinterest-share-url={image.image}
+              data-reddit-share-url={image.image}
+              data-bsky-share-url={image.image}
+              data-ms-share-url={image.image}
             >
               <img
                 src={image.thumbnail[512]}
