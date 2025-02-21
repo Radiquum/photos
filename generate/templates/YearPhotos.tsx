@@ -20,11 +20,19 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
       >
         {images.map((image) => {
           const aspectRatio = image.width / image.height;
+          const date = new Date(image.date);
+          const fmtDate = `${date.getDate()}/${(date.getMonth() + 1)
+            .toString()
+            .padStart(2, "0")}/${date.getFullYear()}`;
           return (
             <a
               href={image.image}
-              className={`w-full h-full hidden ${
-                aspectRatio < 0.95 ? "" : aspectRatio > 1.05 ? "lg:[grid-column:span_2]" : "aspect-square"
+              className={`w-full h-full hidden relative ${
+                aspectRatio < 0.95
+                  ? ""
+                  : aspectRatio > 1.05
+                  ? "lg:[grid-column:span_2]"
+                  : "aspect-square"
               }`}
               key={`${year}-${image.id}`}
               data-slide-name={image.id}
@@ -47,6 +55,14 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
                 loading="lazy"
                 alt={image.alt}
               />
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 to-95% to-transparent pt-8 p-2">
+                <div className="flex flex-col md:flex-row md:items-center md:gap-2 text-gray-200 text-xs lg:text-sm">
+                  <div>
+                    {image.width}x{image.height}
+                  </div>
+                  <div>{fmtDate}</div>
+                </div>
+              </div>
             </a>
           );
         })}
