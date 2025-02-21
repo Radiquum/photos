@@ -5,11 +5,13 @@ galleries.forEach((item, idx) => {
     plugins: [lgThumbnail, lgHash, lgShare, lgFullscreen, lgZoom],
     speed: 500,
     thumbnail: true,
-    animateThumb: false,
+    download: true,
+    animateThumb: true,
     zoomFromOrigin: false,
-    toggleThumb: true,
+    toggleThumb: false,
     galleryId: Number(item.getAttribute('data-year')),
     hash: true,
     customSlideName: true,
+    mobileSettings: { controls: true, showCloseIcon: true, download: true }
   });
 });

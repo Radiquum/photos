@@ -29,21 +29,20 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
               key={`${year}-${image.id}`}
               data-slide-name={image.id}
               data-src={image.thumbnail[2048]}
-              data-lg-size={`512-100-480, 1200-513-960, 2048-1201`}
-              data-responsive={`${image.thumbnail[512]} 480, ${image.thumbnail[1024]} 960`}
-              data-srcset={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 960w, ${image.thumbnail[2048]} 1920w`}
-              data-sizes="(max-width: 600px) 480px,
-                        (max-width: 1200px) 960px,
-                        1920px"
+              data-srcset={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 1440w, ${image.thumbnail[2048]} 2001w`}
+              data-sizes="(max-width: 1000x) 480px,
+                        (max-width: 2000px) 1440px,
+                        2001px"
               data-download-url={image.image}
             >
               <img
                 src={image.thumbnail[512]}
-                srcSet={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 960w, ${image.thumbnail[2048]} 1920w`}
-                sizes="(max-width: 600px) 480px,
-                    (max-width: 1200px) 960px,
-                    1920px"
-                className="w-full h-full object-cover"
+                srcSet={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 1440w, ${image.thumbnail[2048]} 2001w`}
+                sizes="(max-width: 1000px) 480px,
+                    (max-width: 2000px) 1440px,
+                    2001px"
+                className="w-full h-full object-cover rounded-sm"
+                loading="lazy"
                 alt={image.alt}
               />
             </a>
