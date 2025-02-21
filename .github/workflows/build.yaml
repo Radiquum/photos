@@ -55,9 +55,8 @@ jobs:
           FIREBASE_COLLECTION: ${{ secrets.FIREBASE_COLLECTION }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        working-directory: ./generate
         with:
-          path: ./out/
+          path: ./generate/out/
 
   # Deployment job
   deploy:
