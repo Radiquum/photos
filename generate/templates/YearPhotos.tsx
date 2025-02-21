@@ -7,7 +7,7 @@ interface YearPhotosProps {
 
 export default function YearPhotos({ year, images }: YearPhotosProps) {
   return (
-    <div>
+    <div className="hidden">
       <h2 className="text-2xl font-bold xl:text-3xl 2xl:text-4xl inter-semibold mb-4">
         {year}
       </h2>
@@ -23,7 +23,7 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
           return (
             <a
               href={image.image}
-              className={`w-full h-full ${
+              className={`w-full h-full hidden ${
                 aspectRatio < 0.95 ? "" : aspectRatio > 1.05 ? "lg:[grid-column:span_2]" : "aspect-square"
               }`}
               key={`${year}-${image.id}`}
@@ -34,6 +34,8 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
                         (max-width: 2000px) 1440px,
                         2001px"
               data-download-url={image.image}
+              data-type="image"
+              data-tags={image.tags.join(",")}
             >
               <img
                 src={image.thumbnail[512]}

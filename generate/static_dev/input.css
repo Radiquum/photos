@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin 'tailwind-scrollbar';
 
 .inter-semibold {
   font-family: "Inter", serif;
