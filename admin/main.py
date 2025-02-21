@@ -152,6 +152,22 @@ def ApiUpload():
 
     file = request.files.get("file")
 
+    month = datetime.fromtimestamp(float(str(request.form.get("date"))[:10])).month
+
+    winter = [12, 1, 2]
+    spring = [3, 4, 5]
+    summer = [6, 7, 8]
+    autumn = [9, 10, 11]
+
+    if month in winter and not "winter" in tags:
+        tags.append("winter")
+    elif month in spring and not "spring" in tags:
+        tags.append("spring")
+    elif month in summer and not "summer" in tags:
+        tags.append("summer")
+    elif month in autumn and not "autumn" in tags:
+        tags.append("autumn")
+
     if file.filename == "":
         return Response(
             '{"status": "error", "message": "FLASK ERR: GET FILE ERROR"}', 500
