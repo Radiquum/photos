@@ -1,6 +1,6 @@
 export default function Tags({ tags }: { tags: string[] }) {
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto mt-2">
       <div className="flex overflow-x-auto px-4 py-2 gap-2 scrollbar-thin scrollbar-corner-rounded-sm scrollbar-thumb-gray-700 scrollbar-track-gray-900">
         <button
           className="bg-gray-800 rounded-lg px-4 py-1 text-sm"

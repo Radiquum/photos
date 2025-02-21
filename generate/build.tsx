@@ -6,7 +6,6 @@ import { renderToString } from "react-dom/server";
 import fs from "fs";
 import exec from "child_process";
 import Base from "./templates/Base";
-import Header from "./templates/Header";
 import YearPhotos from "./templates/YearPhotos";
 import Tags from "./templates/Tags";
 
@@ -123,7 +122,6 @@ Object.keys(items).forEach((year) => {
 
 const html = renderToString(
   <Base isDev={ENVIRONMENT == "dev"}>
-    <Header />
     <Tags tags={tags} />
     <div className="container mx-auto p-4 flex flex-col gap-4">
       {Object.keys(items).sort().reverse().map((year) => (
