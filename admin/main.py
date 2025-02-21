@@ -1,6 +1,7 @@
 import json
 import PIL
 import PIL.Image
+import PIL.ImageOps
 import boto3.session
 from flask import Flask, render_template, request, Response, redirect, url_for
 from werkzeug.utils import secure_filename
@@ -184,6 +185,8 @@ def ApiUpload():
     file_ext = filename.split(".")[-1]
 
     Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+    PIL.ImageOps.exif_transpose(Image, in_place=True)
+
     try:
         db.collection(os.getenv("PREFIX")).add(
             {
@@ -227,6 +230,7 @@ def ApiUpload():
 
     for size in SIZES:
         Image = PIL.Image.open(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+        PIL.ImageOps.exif_transpose(Image, in_place=True)
         Image.thumbnail(size, PIL.Image.Resampling.LANCZOS)
         Image.save(
             os.path.join(
