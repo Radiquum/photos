@@ -38,7 +38,7 @@ jobs:
         id: pages
         uses: actions/configure-pages@v4
       - name: Get FireBase json from environment
-        run: "echo $FIREBASE_SERVICE_ACCOUNT_BLOB > firebase-adminsdk.json"
+        run: "echo $FIREBASE_SERVICE_ACCOUNT_BLOB > ./firebase-adminsdk.json"
         working-directory: ./generate
         env:
           FIREBASE_SERVICE_ACCOUNT_BLOB: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BLOB }}
