@@ -13,7 +13,7 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
       </h2>
 
       <div
-        className="grid grid-cols-6 grid-flow-row-dense gap-2"
+        className="grid grid-cols-2 lg:grid-cols-5 xl:grid-cols-7 grid-flow-row-dense gap-2"
         id={`gallery-${year}`}
         data-type="gallery"
         data-year={year}
@@ -24,7 +24,7 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
             <a
               href={image.image}
               className={`w-full h-full ${
-                aspectRatio < 0.95 ? "[grid-row:span_2] aspect-[1/2]" : aspectRatio > 1.05 ? "[grid-column:span_2] aspect-[2/1]" : "aspect-square"
+                aspectRatio < 0.95 ? "" : aspectRatio > 1.05 ? "lg:[grid-column:span_2]" : "aspect-square"
               }`}
               key={`${year}-${image.id}`}
               data-slide-name={image.id}
