@@ -41,6 +41,29 @@ export default function Base({ children, isDev }: BaseProps) {
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-zoom.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.8.2/css/lg-fullscreen.min.css" />
 
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Kentai Radiquum" />
+        <meta property="og:url" content="https://radiquum.wah.su" />
+        <meta property="og:image" content="https://radiquum.wah.su/static/opengraph.png" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:description"
+            content="Online gallery of Kentai Radiquum" />
+        <meta property="og:image:width" content="1203" />
+        <meta property="og:image:height" content="627" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Kentai Radiquum" />
+        <meta name="twitter:site" content="@radiquum" />
+        <meta name="twitter:description"
+            content="Online gallery of Kentai Radiquum" />
+        <meta name="twitter:image" content="https://radiquum.wah.su/static/opengraph.png" />
+
+        <script defer data-domain="radiquum.wah.su/photos" data-api="https://a.wah.su/api/event" src="https://a.wah.su/js/script.js"></script>
       </head>
       <body className="bg-[#121B2C] text-white">
         <Header />
