@@ -24,6 +24,8 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
           const fmtDate = `${date.getDate()}/${(date.getMonth() + 1)
             .toString()
             .padStart(2, "0")}/${date.getFullYear()}`;
+          aspectRatio < 0.95 ? image.tags.push("portrait") : aspectRatio > 1.05 ? image.tags.push("landscape") : image.tags.push("square");
+
           return (
             <a
               href={image.image}

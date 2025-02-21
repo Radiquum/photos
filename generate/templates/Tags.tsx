@@ -10,6 +10,30 @@ export default function Tags({ tags }: { tags: string[] }) {
         >
           all
         </button>
+        <button
+          className="bg-gray-800 rounded-lg px-4 py-1 text-sm"
+          key="all"
+          data-type="tag"
+          data-tag="portrait"
+        >
+          portrait
+        </button>
+        <button
+          className="bg-gray-800 rounded-lg px-4 py-1 text-sm"
+          key="all"
+          data-type="tag"
+          data-tag="landscape"
+        >
+          landscape
+        </button>
+        <button
+          className="bg-gray-800 rounded-lg px-4 py-1 text-sm"
+          key="all"
+          data-type="tag"
+          data-tag="square"
+        >
+          square
+        </button>
         {tags.map((tag) => (
           <button
             className="bg-gray-800 rounded-lg px-4 py-1 text-sm hidden"
