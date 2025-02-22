@@ -29,7 +29,7 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
           return (
             <a
               href={image.image}
-              className={`w-full h-full hidden relative ${
+              className={`w-full h-full hidden relative min-h-[228px] ${
                 aspectRatio < 0.95
                   ? ""
                   : aspectRatio > 1.05
@@ -38,11 +38,11 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
               }`}
               key={`${year}-${image.id}`}
               data-slide-name={image.id}
-              data-src={image.thumbnail[2048]}
-              data-srcset={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 1440w, ${image.thumbnail[2048]} 2001w`}
-              data-sizes="(max-width: 1000x) 480px,
-                        (max-width: 2000px) 1440px,
-                        2001px"
+              data-src={image.thumbnail[1024]}
+              data-srcset={`${image.thumbnail[512]} 512w, ${image.thumbnail[1024]} 1024w, ${image.thumbnail[2048]} 2048w`}
+              data-sizes="(max-width: 1281x) 512px,
+                        (max-width: 2400px) 1024px,
+                        2048px"
               data-download-url={image.image}
               data-type="image"
               data-tags={image.tags.join(",")}
@@ -61,15 +61,15 @@ export default function YearPhotos({ year, images }: YearPhotosProps) {
             >
               <img
                 src={image.thumbnail[512]}
-                srcSet={`${image.thumbnail[512]} 480w, ${image.thumbnail[1024]} 1440w, ${image.thumbnail[2048]} 2001w`}
-                sizes="(max-width: 1000px) 480px,
-                    (max-width: 2000px) 1440px,
-                    2001px"
+                srcSet={`${image.thumbnail[512]} 512w, ${image.thumbnail[1024]} 1024w, ${image.thumbnail[2048]} 2048w`}
+                sizes="(max-width: 1281px) 512px,
+                    (max-width: 2400px) 1024px,
+                    2048px"
                 className="w-full h-full object-cover rounded-sm"
                 loading="lazy"
                 alt={image.alt}
               />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 to-95% to-transparent pt-8 p-2">
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/75 to-95% to-transparent pt-8 p-2 invisible" data-overlay="true">
                 <div className="flex flex-col md:flex-row md:items-center md:gap-2 text-gray-200 text-xs lg:text-sm">
                   <div>
                     {image.width}x{image.height}

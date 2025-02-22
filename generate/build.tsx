@@ -123,7 +123,7 @@ Object.keys(items).forEach((year) => {
 const html = renderToString(
   <Base isDev={ENVIRONMENT == "dev"}>
     <Tags tags={tags} />
-    <div className="container mx-auto p-4 flex flex-col gap-4">
+    <div className="container mx-auto p-4 flex flex-col gap-4 flex-1">
       {Object.keys(items).sort().reverse().map((year) => (
         <YearPhotos
           year={year}

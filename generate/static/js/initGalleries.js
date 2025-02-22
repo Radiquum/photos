@@ -31,6 +31,14 @@ Images.forEach((item) => {
         availableTags.push(imTags[i]);
       }
     }
+    if (item.querySelector("img").height > 0) {
+      item.querySelector("[data-overlay]").classList.remove("invisible");
+    } else {
+      item.querySelector("img").addEventListener("load", () => {
+        item.querySelector("[data-overlay]").classList.remove("invisible");
+        this.removeEventListener("load", this);
+      });
+    }
   }
 });
 

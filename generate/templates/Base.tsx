@@ -65,7 +65,7 @@ export default function Base({ children, isDev }: BaseProps) {
 
         <script defer data-domain="radiquum.wah.su/photos" data-api="https://a.wah.su/api/event" src="https://a.wah.su/js/script.js"></script>
       </head>
-      <body className="bg-[#121B2C] text-white">
+      <body className="bg-[#121B2C] text-white min-h-screen flex flex-col">
         <Header />
         {children}
         <Footer />
