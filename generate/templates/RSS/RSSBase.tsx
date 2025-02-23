@@ -25,8 +25,8 @@ function RSS({ children, lastPostDate }: any) {
         <atom:link href="https://radiquum.wah.su/photos/feed.xml" rel="self" type="application/rss+xml" />
         <lastBuildDate>{new Date().toUTCString()}</lastBuildDate>
         <pubDate>{new Date(lastPostDate).toUTCString()}</pubDate>
+        {children}
       </channel>
-      {children}
     </rss>
   );
 }
