@@ -14,7 +14,7 @@ export const rss = (images: Image[]) => {
 };
 function RSS({ children, lastPostDate }: any) {
   return (
-    <rss version="2.0">
+    <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
       <channel>
         <title>Radiquum Photos</title>
         <description>Online Gallery of @radiquum</description>
@@ -22,6 +22,7 @@ function RSS({ children, lastPostDate }: any) {
         <language>en-us</language>
         <category>Photography</category>
         <copyright>CC BY-SA 4.0</copyright>
+        <atom:link href="https://radiquum.wah.su/photos/feed.xml" rel="self" type="application/rss+xml" />
         <lastBuildDate>{new Date().toUTCString()}</lastBuildDate>
         <pubDate>{new Date(lastPostDate).toUTCString()}</pubDate>
       </channel>
