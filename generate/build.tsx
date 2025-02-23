@@ -8,6 +8,7 @@ import exec from "child_process";
 import Base from "./templates/Base";
 import YearPhotos from "./templates/YearPhotos";
 import Tags from "./templates/Tags";
+import { rss } from "./templates/RSS/RSSBase";
 
 const log = new Log();
 
@@ -57,6 +58,7 @@ export type Years = Record<string, Image[]>;
 
 let tags: string[] = [];
 let items: Record<string, Image[]> = {};
+let rssItems: Image[] = [];
 
 function addTag(tag: string) {
   if (tags.includes(tag)) {
@@ -68,7 +70,8 @@ function addTag(tag: string) {
 if (
   !fs.existsSync("data") ||
   !fs.existsSync("data/tags.json") ||
-  !fs.existsSync("data/items.json")
+  !fs.existsSync("data/items.json") ||
+  !fs.existsSync("data/rssItems.json")
 ) {
   log.warn("data/tags.json or data/items.json does not exist");
   await db
@@ -95,7 +98,23 @@ if (
           thumbnail: {
             "512": `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
             "1024": `${ENDPOINT}/${BUCKET}/${path}/${path}-1024.${ext}`,
-            "2048": `${ENDPOINT}/${BUCKET}/${path}/${path}-2048.${ext}`
+            "2048": `${ENDPOINT}/${BUCKET}/${path}/${path}-2048.${ext}`,
+          },
+          alt: data.alt,
+          tags: data.tags,
+          urls: data.urls,
+          mimetype: data.mimetype,
+          width: data.width,
+          height: data.height,
+          date: data.date,
+        });
+        rssItems.push({
+          id: doc.id,
+          image: `${ENDPOINT}/${BUCKET}/${path}/${path}.${ext}`,
+          thumbnail: {
+            "512": `${ENDPOINT}/${BUCKET}/${path}/${path}-512.${ext}`,
+            "1024": `${ENDPOINT}/${BUCKET}/${path}/${path}-1024.${ext}`,
+            "2048": `${ENDPOINT}/${BUCKET}/${path}/${path}-2048.${ext}`,
           },
           alt: data.alt,
           tags: data.tags,
@@ -110,10 +129,12 @@ if (
   if (!fs.existsSync("data")) fs.mkdirSync("data");
   fs.writeFileSync("data/tags.json", JSON.stringify(tags));
   fs.writeFileSync("data/items.json", JSON.stringify(items));
+  fs.writeFileSync("data/rssItems.json", JSON.stringify(rssItems));
 } else {
   log.warn("using cached data");
   tags = JSON.parse(fs.readFileSync("data/tags.json", "utf-8"));
   items = JSON.parse(fs.readFileSync("data/items.json", "utf-8"));
+  rssItems = JSON.parse(fs.readFileSync("data/rssItems.json", "utf-8"));
 }
 
 Object.keys(items).forEach((year) => {
@@ -124,13 +145,16 @@ const html = renderToString(
   <Base isDev={ENVIRONMENT == "dev"}>
     <Tags tags={tags} />
     <div className="container mx-auto p-4 flex flex-col gap-4 flex-1">
-      {Object.keys(items).sort().reverse().map((year) => (
-        <YearPhotos
-          year={year}
-          images={items[year]}
-          key={`${year}-container`}
-        />
-      ))}
+      {Object.keys(items)
+        .sort()
+        .reverse()
+        .map((year) => (
+          <YearPhotos
+            year={year}
+            images={items[year]}
+            key={`${year}-container`}
+          />
+        ))}
     </div>
   </Base>
 );
@@ -161,4 +185,9 @@ if (ENVIRONMENT == "dev") {
   );
 }
 fs.writeFileSync("out/index.html", `<!DOCTYPE html />${html}`);
+
+
+rssItems.sort((a, b) => b.date - a.date);
+rssItems = rssItems.slice(0, 10);
+fs.writeFileSync("out/feed.xml", `<?xml version="1.0" encoding="utf-8"?>${rss(rssItems)}`);
 log.info("Build finished!");
